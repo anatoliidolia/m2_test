@@ -1,0 +1,7 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Interactivated\Integration\Block\Orders" name="interactivated_orders" template="Interactivated_Integration::orders.phtml" />
+        </referenceContainer>
+    </body>
+</page>
