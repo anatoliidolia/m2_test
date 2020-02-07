@@ -49,11 +49,8 @@ class Orders extends \Magento\Framework\View\Element\Template
         var_dump($data[0]['entity_id']);
 
         $lastname = $data[0]['entity_id'];
+        return $lastname;
 //        echo count($data[])
-
-
-
-
 
 //        $connection = $this->resourceConnection->getConnection('custom');
 
@@ -65,8 +62,6 @@ class Orders extends \Magento\Framework\View\Element\Template
 //
 //        return $some;
 
-
-
     }
 
     public function connectionToNewTable(){
@@ -76,6 +71,10 @@ class Orders extends \Magento\Framework\View\Element\Template
 //        var_dump($data[1]);
 //        die();
 
+        $lastname = $this->getGuestOrderCollection();
+        var_dump($lastname);
+        echo '123';
+        die();
 
         $some = $connection->query("UPDATE `table_for_data` SET `lastname` = `123123` WHERE `table_for_data`.`id` = 1;");
 
