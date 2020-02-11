@@ -2,6 +2,7 @@
 
 namespace Interactivated\Integration\Block;
 
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\App\ResourceConnection;
@@ -169,14 +170,11 @@ return $setToDb;
             ->create()
             ->addFieldToSelect('*');
 
-        $orderCollecion->addAttributeToFilter('customer_is_guest', ['eq'=>1]);
+        $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
 
-        $data = $orderCollecion->getData();
+        $output =count($orderCollecion->getData());
 
-        $output= count($data);
-
-
-        return $output-1;
+        return $output;
 
 //        var_dump($data);
 //        die('fdsrgfdsg');
@@ -211,20 +209,24 @@ return $setToDb;
             ->create()
             ->addFieldToSelect('*');
 
-        $orderCollecion->addAttributeToFilter('customer_is_guest', ['eq'=>1]);
+        $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
+
+
 
         $data = $orderCollecion->getData();
-        $asd = $this->getGuestOrderCollection();
+        $asd = $this->getGuestOrderCollection()-1;
+
 
 //var_dump($data[$asd]['increment_id']);
 //die('some');
 
 
 
+
+
         $increment_id = $data[$asd]['increment_id'];
 
-//        var_dump($increment_id);
-//        die('connectionTo tnew table');
+
 
 
         $customer_id = $data[$asd]['customer_id'];
@@ -235,9 +237,7 @@ return $setToDb;
 
 
 
-         $variable =  '123';
 
-         echo "<br>";
 //        var_dump($variable);
 
 //        echo $total_amount;
