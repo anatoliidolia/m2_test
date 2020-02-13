@@ -12,6 +12,7 @@ class Orders extends \Magento\Framework\View\Element\Template
 
     protected $_orderCollectionFactory;
     private $resourceConnection;
+    private $orderRepository;
 
     /**
      * @var AdapterInterface
@@ -24,12 +25,14 @@ class Orders extends \Magento\Framework\View\Element\Template
     public function __construct(
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
         \Magento\Framework\ObjectManagerInterface $objectManager,
         ResourceConnection $resourceConnection
     )
     {
         parent::__construct($context);
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->orderRepository = $orderRepository;
         $this->resourceConnection = $resourceConnection;
         $this->_objectManager = $objectManager;
 
@@ -41,51 +44,56 @@ class Orders extends \Magento\Framework\View\Element\Template
         return ('hello world');
     }
 
+
+    public  function ordersItem(){
+
+        $orderID = $this->getGuestOrderCollection();
+
+        $order = $this->orderRepository->get($orderID);
+
+
+        foreach ($order->getAllItems() as $item) {
+            $sku= $item['sku'];
+            $size= $item['size'];
+            $color= $item['color'];
+            $line= $item['line'];
+            $discount_amount= $item['discount_amount'];
+            $price_unit= $item['price'];
+            $base_row_total_incl_tax= $item['base_row_total_incl_tax'];
+            $qty= $item['product_options']['info_buyRequest']['qty'];
+
+        }
+
+        $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
+
+
+        $increment = $getCustomerInformation->getIncrementId();//incriment ID
+
+
+        $connection = $this->resourceConnection->getConnection('custom');
+
+
+        $setToDbOrderItem =  $connection->query( "UPDATE `orders_items` SET `increment_id`='$increment',`product_sku`='$sku',`size`='$size',`color`='$color',`line`='$line',`qty`='$qty',`price_unit`='$price_unit',`discount_1`='$discount_amount',`total_amount_line`='$base_row_total_incl_tax' WHERE `orders_items`.`id` = 1;")->fetch();
+
+        return $setToDbOrderItem;
+
+    }
+
     public function orderInformation(){
 
 
         $orderID = $this->getGuestOrderCollection();
 
-//        var_dump($getter);
-//        die();
-//
-//      $orderID = count($getter);
-
 
         $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
-//        var_dump($getCustomerInformation);
-//        die('hello world');
+
 
 
         $getShippingInformation = $getCustomerInformation->getShippingAddress();
-//        var_dump($getShippingInformation->getCustomerId());
-//            ->getShippingAddress();
 
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getStoreName();
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getCustomerName();//customer name
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getStreet();//array(2) { [0]=> string(10) "karazina 1" [1]=> string(7) "Florida" }
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getLastName();//lastname
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getFirstName();//firstname
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getCity();//city
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getRegion();//region
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getCountryId();//US country id
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getPostCode();//postCode
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getTelephone();//telephome
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getEmail();//email
 
         $customer_id = $getCustomerInformation->getCustomerId();//customer_ID
 
-//        $increment = $this->getGuestOrderCollection()['increment_id'];//incriment ID
 
         $increment = $getCustomerInformation->getIncrementId();//incriment ID
 
@@ -125,50 +133,10 @@ class Orders extends \Magento\Framework\View\Element\Template
 
 
             $setToDb =  $connection->query( "UPDATE `orders_customers` SET `customer_id`='$customer_id',`increment_id`='$increment',`name`='$name',`dni`='$dni',`telf`='$telf',`address`='$adress' WHERE `orders_customers`.`id` = 2;")->fetch();
-//
+
+        return $setToDb;
 
 
-//
-return $setToDb;
-
-//            die('use concatenation, firstname and lastname');
-
-
-//        var_dump($customer_id);
-//        die('get customer ID');
-
-
-//        var_dump($increment);
-//        die('increment_die');
-
-
-//        var_dump($orderObj);
-//            die('some text');
-
-
-            //            ->getBaseShippingInvoiced();
-//        ->getShippingAddress();
-//        ->getEmailCustomerNote();
-
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getTelephone();
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getTelephone();
-//        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getTelephone();
-
-
-//        var_dump($orderObj);
-//        die('_______________');
-
-//            var_dump(get_class_methods($orderObj));
-//            die('qweqwewqewqeqweqwe');
-//
-//            $shippingAddressObj = $orderObj->getShippingAddress();
-//
-//            $shippingAddressArray = $shippingAddressObj->getData();
-//
-//            $firstname = $shippingAddressArray['firstname'];
-//
-//            var_dump($firstname);
-//            die('21321321');
 
         }
 
@@ -184,28 +152,7 @@ return $setToDb;
 
         return $output;
 
-//        var_dump($data);
-//        die('fdsrgfdsg');
-//
-//        $lastname = end($data); // return last element of array
-//
-//        var_dump($lastname);
-//
-//
-//        return $lastname;
 
-
-//        echo count($data[])
-
-//        $connection = $this->resourceConnection->getConnection('custom');
-
-//        var_dump($data[1]);
-//        die();
-
-
-//        $some = $connection->query("UPDATE `table_for_data` SET `lastname` = `123123` WHERE `table_for_data`.`id` = 1;");
-//
-//        return $some;
 
     }
 
@@ -219,38 +166,18 @@ return $setToDb;
 
         $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
 
-
-
         $data = $orderCollecion->getData();
         $asd = $this->getGuestOrderCollection()-1;
-
-
-//var_dump($data[$asd]['increment_id']);
-//die('some');
-
-
 
 
 
         $increment_id = $data[$asd]['increment_id'];
 
 
-
-
         $customer_id = $data[$asd]['customer_id'];
         $total_amount = $data[$asd]['base_total_due'];
         $status = $data[$asd]['status'];
-//        $status = 1;
         $updated_at = $data[$asd]['updated_at'];
-
-
-
-
-//        var_dump($variable);
-
-//        echo $total_amount;
-
-//        $some = $connection->query("UPDATE `table_for_data` SET `lastname` = '$variable' WHERE `table_for_data`.`id` = 1;");
 
 
 
