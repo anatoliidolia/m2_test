@@ -52,8 +52,14 @@ class Orders extends \Magento\Framework\View\Element\Template
 //      $orderID = count($getter);
 
 
+        $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
+//        var_dump($getCustomerInformation);
+//        die('hello world');
 
-        $getShippingInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress();
+
+        $getShippingInformation = $getCustomerInformation->getShippingAddress();
+//        var_dump($getShippingInformation->getCustomerId());
+//            ->getShippingAddress();
 
 //        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getStoreName();
 
@@ -77,9 +83,12 @@ class Orders extends \Magento\Framework\View\Element\Template
 
 //        $orderObj =  $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID)->getShippingAddress()->getEmail();//email
 
-        $customer_id = $getShippingInformation->getCustomerId();//customer_ID
+        $customer_id = $getCustomerInformation->getCustomerId();//customer_ID
 
-        $increment = $this->getGuestOrderCollection()['increment_id'];//incriment ID
+//        $increment = $this->getGuestOrderCollection()['increment_id'];//incriment ID
+
+        $increment = $getCustomerInformation->getIncrementId();//incriment ID
+
 
         $lastname = $getShippingInformation->getLastName();
 
@@ -162,7 +171,6 @@ return $setToDb;
 //            die('21321321');
 
         }
-
 
     public function getGuestOrderCollection()
     {
