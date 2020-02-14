@@ -55,12 +55,36 @@ class Orders extends \Magento\Framework\View\Element\Template
         foreach ($order->getAllItems() as $item) {
             $sku= $item['sku'];
             $size= $item['size'];
+
             $color= $item['color'];
             $line= $item['line'];
             $discount_amount= $item['discount_amount'];
-            $price_unit= $item['price'];
+            $price_unit= $item->getBaseOriginalPrice();
             $base_row_total_incl_tax= $item['base_row_total_incl_tax'];
             $qty= $item['product_options']['info_buyRequest']['qty'];
+
+
+////            var_dump($item->getProduct()->getName());
+//
+//            $attr = $item->getProduct();
+//
+//            foreach($attr as $a)
+//            {
+//                var_dump($a);
+//                die('text for die');
+//            }
+//
+////            var_dump(get_class_methods($item));
+//            echo "<pre>";
+////            var_dump($size['info_buyRequest']);
+//            die('some');
+////            var_dump($sku);
+////            var_dump($sku)['product_sku'];
+////var_dump(get_class_methods($item));
+//var_dump($item->getProductOptions());
+//
+////            print_r(get_class_methods($item->getName()));
+//            die('some text');
 
         }
 
@@ -148,8 +172,16 @@ class Orders extends \Magento\Framework\View\Element\Template
 
         $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
 
-        $output =count($orderCollecion->getData());
+     //   $output =$orderCollecion->getData();
+        //var_dump(get_class_methods($orderCollecion));
+foreach ($orderCollecion as $order){
+  //  var_dump(get_class_methods($order));
+    var_dump($order->getId());
+    var_dump($order->getShippingAddress()->getEmail());
+    var_dump($order->getId());
 
+}
+        die();
         return $output;
 
 
