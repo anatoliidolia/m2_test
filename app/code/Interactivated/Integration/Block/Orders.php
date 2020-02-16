@@ -64,40 +64,19 @@ class Orders extends \Magento\Framework\View\Element\Template
             $qty= $item['product_options']['info_buyRequest']['qty'];
 
 
-////            var_dump($item->getProduct()->getName());
-//
-//            $attr = $item->getProduct();
-//
-//            foreach($attr as $a)
-//            {
-//                var_dump($a);
-//                die('text for die');
-//            }
-//
-////            var_dump(get_class_methods($item));
-//            echo "<pre>";
-////            var_dump($size['info_buyRequest']);
-//            die('some');
-////            var_dump($sku);
-////            var_dump($sku)['product_sku'];
-////var_dump(get_class_methods($item));
-//var_dump($item->getProductOptions());
-//
-////            print_r(get_class_methods($item->getName()));
-//            die('some text');
-
         }
+
 
         $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
 
 
         $increment = $getCustomerInformation->getIncrementId();//incriment ID
 
-
         $connection = $this->resourceConnection->getConnection('custom');
 
 
-        $setToDbOrderItem =  $connection->query( "UPDATE `orders_items` SET `increment_id`='$increment',`product_sku`='$sku',`size`='$size',`color`='$color',`line`='$line',`qty`='$qty',`price_unit`='$price_unit',`discount_1`='$discount_amount',`total_amount_line`='$base_row_total_incl_tax' WHERE `orders_items`.`id` = 1;")->fetch();
+        $setToDbOrderItem =  $connection->query( "UPDATE `orders_items` SET `increment_id`='$increment',`product_sku`='$sku',`size`='$size',`color`='$color',`line`='$line',`qty`='$qty',`price_unit`='$price_unit',`discount_1`='$discount_amount',`total_amount_line`='$base_row_total_incl_tax' WHERE `orders_items`.`id` = 1;")->execute();
+
 
         return $setToDbOrderItem;
 
@@ -156,7 +135,7 @@ class Orders extends \Magento\Framework\View\Element\Template
         $connection = $this->resourceConnection->getConnection('custom');
 
 
-            $setToDb =  $connection->query( "UPDATE `orders_customers` SET `customer_id`='$customer_id',`increment_id`='$increment',`name`='$name',`dni`='$dni',`telf`='$telf',`address`='$adress' WHERE `orders_customers`.`id` = 2;")->fetch();
+            $setToDb =  $connection->query( "UPDATE `orders_customers` SET `customer_id`='$customer_id',`increment_id`='$increment',`name`='$name',`dni`='$dni',`telf`='$telf',`address`='$adress' WHERE `orders_customers`.`id` = '2';")->execute();
 
         return $setToDb;
 
@@ -172,19 +151,84 @@ class Orders extends \Magento\Framework\View\Element\Template
 
         $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
 
-     //   $output =$orderCollecion->getData();
-        //var_dump(get_class_methods($orderCollecion));
-foreach ($orderCollecion as $order){
-  //  var_dump(get_class_methods($order));
-    var_dump($order->getId());
-    var_dump($order->getShippingAddress()->getEmail());
-    var_dump($order->getId());
 
+        foreach ($orderCollecion as $order){
+            //  var_dump(get_class_methods($order));
+            var_dump($order->getId());
+//            var_dump($order->getShippingAddress()->getEmail());
+//            var_dump($order->getId());
+//            var_dump(get_class_methods($order));
+
+
+        }
+//        var_dump(get_class_methods($order->getAllItems()));//get all order collection
+foreach ($order->getAllItems() as $item){
+    var_dump( $item['sku']);
+    $qty= $item['product_optfquest']['qty'];
+    $price_unit= $item->getBaseOriginalPrice();
+    var_dump($price_unit);
+die();
 }
+
+
+//        foreach ($order->getAllItems() as $item) {
+//            $sku= $item['sku'];
+//            $size= $item['size'];
+//
+//            $color= $item['color'];
+//            $line= $item['line'];
+//            $discount_amount= $item['discount_amount'];
+//            $price_unit= $item->getBaseOriginalPrice();
+//            $base_row_total_incl_tax= $item['base_row_total_incl_tax']; //            link for old method
+//            $qty= $item['product_options']['info_buyRequest']['qty'];
+//
+//
+//        }
+
+
+
+var_dump($order->getAllItems()->getQtyToShip());
+
+
+//        var_dump(get_class_methods($order->getShippingAddress())); //get collection for shipping adress
+//
+//        var_dump($order->getShippingAddress()->getPostcode());//  how get data for order_customers
+
+//        var_dump($order->getIncrementId());
+//        var_dump($order->getBaseSubtotal());//total amount
+//        var_dump($order->getCustomerId());
+
+//        var_dump(get_class_methods($order->getAllItems())());
         die();
-        return $output;
 
 
+        var_dump($order->getCustomerId());
+
+
+//        var_dump($order->getCustomerName());// Dolia Dolia
+
+//        var_dump($order->getUpdatedAt());//oreder date
+
+
+
+//        echo "<pre>";
+//        var_dump($order->getState());     //for status
+//        echo "<pre>";
+//        var_dump($order->getStatus());
+
+
+
+die();
+        var_dump($order[$output]);
+        die('text for detect my die()');
+
+
+
+
+
+//        $output =count($orderCollecion->getData());
+//
+//        return $output;
 
     }
 
