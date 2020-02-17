@@ -4,6 +4,7 @@ namespace Interactivated\Integration\Block;
 
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\View\Asset\NotationResolver\Variable;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\App\ResourceConnection;
 
@@ -20,6 +21,7 @@ class Orders extends \Magento\Framework\View\Element\Template
     private $connection;
 
     private $_objectManager;
+    public $customOrderCollectionFactory;
 
 
     public function __construct(
@@ -27,10 +29,12 @@ class Orders extends \Magento\Framework\View\Element\Template
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        \Interactivated\Integration\Model\CustomOrderCollectionFactory $customOrderCollectionFactory
     )
     {
         parent::__construct($context);
+        $this->customOrderCollectionFactory = $customOrderCollectionFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderRepository = $orderRepository;
         $this->resourceConnection = $resourceConnection;
@@ -44,6 +48,9 @@ class Orders extends \Magento\Framework\View\Element\Template
         return ('hello world');
     }
 
+    public  function getCustomOrderCollectionFactory(){
+        return $this->customOrderCollectionFactory;
+    }
 
     public  function ordersItem(){
 
@@ -145,6 +152,7 @@ class Orders extends \Magento\Framework\View\Element\Template
 
     public function getGuestOrderCollection()
     {
+
         $orderCollecion = $this->orderCollectionFactory
             ->create()
             ->addFieldToSelect('*');
@@ -154,7 +162,7 @@ class Orders extends \Magento\Framework\View\Element\Template
 
         foreach ($orderCollecion as $order){
             //  var_dump(get_class_methods($order));
-            var_dump($order->getId());
+//            var_dump($order->getId());
 //            var_dump($order->getShippingAddress()->getEmail());
 //            var_dump($order->getId());
 //            var_dump(get_class_methods($order));
@@ -162,13 +170,14 @@ class Orders extends \Magento\Framework\View\Element\Template
 
         }
 //        var_dump(get_class_methods($order->getAllItems()));//get all order collection
-foreach ($order->getAllItems() as $item){
-    var_dump( $item['sku']);
-    $qty= $item['product_optfquest']['qty'];
-    $price_unit= $item->getBaseOriginalPrice();
-    var_dump($price_unit);
-die();
-}
+
+//foreach ($order->getAllItems() as $item){
+//    var_dump( $item['sku']);
+//    $qty= $item['product_optfquest']['qty'];
+//    $price_unit= $item->getBaseOriginalPrice();
+//    var_dump($price_unit);
+////die();
+//}
 
 
 //        foreach ($order->getAllItems() as $item) {
@@ -187,27 +196,57 @@ die();
 
 
 
-var_dump($order->getAllItems()->getQtyToShip());
+//var_dump($order->getAllItems()->getQtyToShip());
 
 
 //        var_dump(get_class_methods($order->getShippingAddress())); //get collection for shipping adress
 //
 //        var_dump($order->getShippingAddress()->getPostcode());//  how get data for order_customers
 
-//        var_dump($order->getIncrementId());
+
+
+//        var_dump($order->getIncrementId());                   //orders table
 //        var_dump($order->getBaseSubtotal());//total amount
 //        var_dump($order->getCustomerId());
-
-//        var_dump(get_class_methods($order->getAllItems())());
-        die();
+//        var_dump($order->getUpdatedAt());//order date
 
 
-        var_dump($order->getCustomerId());
 
+
+
+
+//        var_dump($order->getCustomerId());//                  orders_customers
+//        var_dump($order->getIncrementId());
 
 //        var_dump($order->getCustomerName());// Dolia Dolia
+////        var_dump($order->getShippingAddress()->getEmail());
+////        var_dump($order->getShippingAddress()->getTelephone());
 
-//        var_dump($order->getUpdatedAt());//oreder date
+//        var_dump($order->getShippingAddress()->getPostcode());//  how get data for order_customers
+
+
+
+
+
+        //        var_dump($order->getIncrementId());           //orders_items
+        foreach ($order->getAllItems() as $item){
+//            var_dump( $item['sku']);                             sku in orders_items
+            $some_value = $item->getProductOptions();
+//            var_dump($some_value['info_buyRequest']['qty']);        // qty in order
+//            var_dump($item->getProductOptions());
+//            var_dump(($item->getQtyToShip()));
+//            var_dump($item->getQtyToInvoice());
+//            $qty= $item['product_optfquest']['qty'];
+//            $price_unit= $item->getBaseOriginalPrice();  //price unit in orders_items
+//            var_dump($price_unit);
+//            var_dump($item->getBaseDiscountAmount());//discount_1 in orders_items
+
+//            var_dump(get_class_methods($item));
+////            DIE();
+//            die();
+//die();
+        }
+
 
 
 
@@ -218,9 +257,9 @@ var_dump($order->getAllItems()->getQtyToShip());
 
 
 
-die();
-        var_dump($order[$output]);
-        die('text for detect my die()');
+//
+//        var_dump($order[$output]);
+//        die('text for detect my die()');
 
 
 
@@ -234,33 +273,49 @@ die();
 
     public function connectionToNewTable(){
 
-        $connection = $this->resourceConnection->getConnection('custom');
-
         $orderCollecion = $this->orderCollectionFactory
             ->create()
             ->addFieldToSelect('*');
 
         $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
 
-        $data = $orderCollecion->getData();
+        $data = $orderCollecion->getData()[5];
         $asd = $this->getGuestOrderCollection()-1;
 
 
 
-        $increment_id = $data[$asd]['increment_id'];
+
+//        $increment_id = $data[$asd]['increment_id'];
+//
+//
+//        $customer_id = $data[$asd]['customer_id'];
+//        $total_amount = $data[$asd]['base_total_due'];
+//        $status = $data[$asd]['status'];
+//        $updated_at = $data[$asd]['updated_at'];
 
 
-        $customer_id = $data[$asd]['customer_id'];
-        $total_amount = $data[$asd]['base_total_due'];
-        $status = $data[$asd]['status'];
-        $updated_at = $data[$asd]['updated_at'];
+       // return $data;
+        $status = $this->updateCustomOrderCollection($data);
+        return $status;
+
+
+ //       $some = $connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
+
+       // return $data;
+
+    }
+    public function updateCustomOrderCollection($data){
 
 
 
+        $customOrderCollection = $this->getCustomOrderCollectionFactory()->create();
 
-        $some = $connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
+        $status = $customOrderCollection->update($data);
 
-        return $some;
+        var_dump($status);
+        die('status');
+
+        return $status;
 
     }
 }

@@ -9,5 +9,8 @@
         <route id="orders" frontName="orders">
             <module name="Interactivated_Integration"/>
         </route>
+        <route id="test" frontName="test">
+            <module name="Interactivated_Integration"/>
+        </route>
     </router>
 </config>
