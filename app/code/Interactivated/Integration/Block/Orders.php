@@ -279,10 +279,7 @@ class Orders extends \Magento\Framework\View\Element\Template
 
         $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
 
-        $data = $orderCollecion->getData()[5];
-        $asd = $this->getGuestOrderCollection()-1;
-
-
+        $data = $orderCollecion->getData();
 
 
 //        $increment_id = $data[$asd]['increment_id'];
@@ -311,9 +308,6 @@ class Orders extends \Magento\Framework\View\Element\Template
         $customOrderCollection = $this->getCustomOrderCollectionFactory()->create();
 
         $status = $customOrderCollection->update($data);
-
-        var_dump($status);
-        die('status');
 
         return $status;
 

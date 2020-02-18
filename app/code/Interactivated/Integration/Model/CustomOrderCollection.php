@@ -34,12 +34,19 @@ namespace Interactivated\Integration\Model;
 
             foreach ($orders as $order)  {
 
-//                if ($this->checkData($order) == true){
-//                    $this->importNewOrder($order);
-//                }
-                if ($order == '6'){
-                    $this->importNewOrder($orders);
+
+                if ($this->checkData($order) == true){
+                    $this->importNewOrder($order);
                 }
+//                $some = $this->checkData($order);
+//                var_dump($some);
+//                die('check first step');
+//                if ($this->checkData($order)==true){
+////                    $checkdata = $this->checkData($order);
+////                    var_dump($checkdata);
+//                    die('hello woodi');
+//                    $this->importNewOrder($orders);
+//                }
 
             }
 
@@ -47,29 +54,72 @@ namespace Interactivated\Integration\Model;
         }
         public function checkData($order){
 
+//var_dump($order);
+//            die('popup woodi');
+//           $orseg =  $order['increment_id'];
+//           var_dump($order);
+//           die('defect in front');
+//            $order=7;
+
+            $check = $order['increment_id'];
+
+            $getIncrement = $this->connection->fetchRow("select `increment_id` from `orders` where `increment_id`='$check';");
+//            var_dump($getIncrement);
+//
+//            if($getIncrement == true){
+//                die('wqeqwe');
+//            }else {
+//                die('что произошло');
+//            }
+//
+//            die('I wont live');
+
+           if( $getIncrement == false){
+          return true;
+           }else{
+               $this->logger->info('Already in DB '.$check);
+               return false;
+           }
+
+//            var_dump(get_class_methods($check));
 
 
-            if($this->connection->query("select * from orders where id=".$order['increment_id'])->execute()==false) {
-
-                return true;
-            }
-            $this->logger->info('Already in DB '.$order['increment_id']);
-            return false;
         }
 
-        public function importNewOrder($orders){
+        public function importNewOrder($order){
+
+//            var_dump($order);
+//            die('local host');
+
 //            var_dump($orders);
 //            die('its variable == 6, please, die()');
 
-            $increment_id = $orders['increment_id'];
+            $increment_id = $order['increment_id'];
 
 
-            $customer_id = $orders['customer_id'];
-            $total_amount = $orders['base_total_due'];
-            $status = $orders['status'];
-            $updated_at = $orders['updated_at'];
-           $status = $this->connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
-            return  $status;
+
+            $customer_id = $order['customer_id'];
+            $total_amount = $order['base_total_due'];
+//            var_dump($total_amount);
+//            die('start to import files');
+            $status = $order['status'];
+            $updated_at = $order['updated_at'];
+            $table = $this->connection->getTableName('orders');
+
+            $arguments = [
+                'id'=> NULL,
+                'increment_id' => $increment_id,
+                'customer_id' => $customer_id,
+                'total_amount' =>$total_amount,
+                'status' => $status,
+                'order_date' => $updated_at
+            ];
+
+            $query = $this->connection->insert($table, $arguments)->execute();
+//                die('stop, please, stop');
+//           $status = $this->connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
+//            INSERT INTO `orders` (`id`, `increment_id`, `customer_id`, `total_amount`, `status`, `order_date`) VALUES (NULL, NULL, NULL, NULL, NULL, NULL);
+
         }
 
 
