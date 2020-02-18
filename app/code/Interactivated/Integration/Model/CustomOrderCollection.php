@@ -8,22 +8,19 @@ namespace Interactivated\Integration\Model;
 
         private $connectionFactory;
         private $connection;
-        private $connectionConfig= array(
-    'host' => 'localhost',
-    'dbname' => 'erp_end',
-    'username' => 'root',
-    'password' => 'q1w2e3r4'
-    );
+
+        private $resourceConnection;
         private $logger;
         public function __construct(
             \Magento\Framework\App\ResourceConnection\ConnectionFactory $connectionFactory,
-            \Psr\Log\LoggerInterface $logger
+            \Psr\Log\LoggerInterface $logger,
+            \Magento\Framework\App\ResourceConnection $resourceConnection
         )
         {
 
             $this->connectionFactory = $connectionFactory;
-            $this->connection = $this->connectionFactory->create($this->connectionConfig);
             $this->logger = $logger;
+            $this->resourceConnection = $resourceConnection;
 
         }
 
@@ -63,7 +60,19 @@ namespace Interactivated\Integration\Model;
 
             $check = $order['increment_id'];
 
-            $getIncrement = $this->connection->fetchRow("select `increment_id` from `orders` where `increment_id`='$check';");
+            $connection = $this->resourceConnection->getConnection('custom');
+
+
+
+            $table = $connection->getTableName('orders');
+//            die('свобода слова');
+
+            $getIncrement = $connection->select()->from($table)->where('increment_id=?',$check);
+            $asdasd=$connection->fetchRow($getIncrement);
+
+//            var_dump($asdasd);
+//            die('як умру то поховайте');
+//            ("select `increment_id` from `orders` where `increment_id`='$check';");
 //            var_dump($getIncrement);
 //
 //            if($getIncrement == true){
@@ -74,7 +83,7 @@ namespace Interactivated\Integration\Model;
 //
 //            die('I wont live');
 
-           if( $getIncrement == false){
+           if( $asdasd == false){
           return true;
            }else{
                $this->logger->info('Already in DB '.$check);
@@ -104,7 +113,11 @@ namespace Interactivated\Integration\Model;
 //            die('start to import files');
             $status = $order['status'];
             $updated_at = $order['updated_at'];
-            $table = $this->connection->getTableName('orders');
+
+            $connection = $this->resourceConnection->getConnection('custom');
+
+
+            $table = $connection->getTableName('orders');
 
             $arguments = [
                 'id'=> NULL,
@@ -115,7 +128,7 @@ namespace Interactivated\Integration\Model;
                 'order_date' => $updated_at
             ];
 
-            $query = $this->connection->insert($table, $arguments)->execute();
+            $query = $connection->insert($table, $arguments)->fetch();
 //                die('stop, please, stop');
 //           $status = $this->connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
 //            INSERT INTO `orders` (`id`, `increment_id`, `customer_id`, `total_amount`, `status`, `order_date`) VALUES (NULL, NULL, NULL, NULL, NULL, NULL);
