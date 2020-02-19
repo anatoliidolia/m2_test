@@ -9,11 +9,13 @@ namespace Interactivated\Integration\Model;
         private $connectionFactory;
         private $connection;
 
+        private $_objectManager;
         private $resourceConnection;
         private $logger;
         public function __construct(
             \Magento\Framework\App\ResourceConnection\ConnectionFactory $connectionFactory,
             \Psr\Log\LoggerInterface $logger,
+            \Magento\Framework\ObjectManagerInterface $objectManager,
             \Magento\Framework\App\ResourceConnection $resourceConnection
         )
         {
@@ -21,19 +23,23 @@ namespace Interactivated\Integration\Model;
             $this->connectionFactory = $connectionFactory;
             $this->logger = $logger;
             $this->resourceConnection = $resourceConnection;
+            $this->_objectManager = $objectManager;
 
         }
 
 
         public function update($orders){
 
-
-
             foreach ($orders as $order)  {
 
-
                 if ($this->checkData($order) == true){
-                    $this->importNewOrder($order);
+//                    if ($this->importNewOrder($order) == true) {
+                        $this->orderInformation($order);
+                        $this->importNewOrder($order);
+//                    }
+
+
+
                 }
 //                $some = $this->checkData($order);
 //                var_dump($some);
@@ -46,7 +52,6 @@ namespace Interactivated\Integration\Model;
 //                }
 
             }
-
 
         }
         public function checkData($order){
@@ -97,7 +102,14 @@ namespace Interactivated\Integration\Model;
 
         public function importNewOrder($order){
 
-//            var_dump($order);
+
+//            $orderID = $order['entity_id'];
+//
+////            var_dump($orderID);
+////            die('die die die');
+//
+//            $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
+//            var_dump(get_class_methods($getCustomerInformation));
 //            die('local host');
 
 //            var_dump($orders);
@@ -117,9 +129,13 @@ namespace Interactivated\Integration\Model;
             $connection = $this->resourceConnection->getConnection('custom');
 
 
-            $table = $connection->getTableName('orders');
 
-            $arguments = [
+
+            $orders = $connection->getTableName('orders');
+
+
+
+            $argumentsOrders = [
                 'id'=> NULL,
                 'increment_id' => $increment_id,
                 'customer_id' => $customer_id,
@@ -127,11 +143,97 @@ namespace Interactivated\Integration\Model;
                 'status' => $status,
                 'order_date' => $updated_at
             ];
+//            $argumentsOrders= [
+//                'id' => NULL,
+//                'customer_id' => $customer_id,
+//                'increment_id' => $increment_id
+//            ];
 
-            $query = $connection->insert($table, $arguments)->fetch();
+
+
+
+            $query = $connection->insert($orders, $argumentsOrders);
+   if($query == true){
+       return true;
+   }else {
+       return true;
+   }
+
+//return $query;
+
+
+
 //                die('stop, please, stop');
 //           $status = $this->connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
 //            INSERT INTO `orders` (`id`, `increment_id`, `customer_id`, `total_amount`, `status`, `order_date`) VALUES (NULL, NULL, NULL, NULL, NULL, NULL);
+
+        }
+
+        public function orderInformation($order){
+
+
+
+            $orderID =$order['entity_id']->;
+//            var_dump($orderID);
+//            die('some texe for detect connection');
+
+
+            $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
+
+            $getShippingInformation = $getCustomerInformation->getShippingAddress();
+
+
+            $customer_id = $getCustomerInformation->getCustomerId();//customer_ID
+
+
+            $increment = $getCustomerInformation->getIncrementId();//incriment ID
+
+
+            $lastname = $getShippingInformation->getLastName();
+
+            $firstname = $getShippingInformation->getFirstName();
+
+            $name = $firstname." ".$lastname;
+
+
+            $telf =  $getShippingInformation->getTelephone();//telephome
+
+            $city =  $getShippingInformation->getCity();//city
+
+            $region =  $getShippingInformation->getRegion();//region
+
+            $countryid =  $getShippingInformation->getCountryId();//US country id
+
+            $postCode =  $getShippingInformation->getPostCode();//postCode
+
+            $email =  $getShippingInformation->getEmail();//email
+
+            $dni = 0;
+
+
+            $adress = $city.", ".$region.", ".$countryid.", ".$postCode.", ".$telf.", ".$email;
+
+            $connection = $this->resourceConnection->getConnection('custom');
+
+
+            $ordersCustomers = $connection->getTableName('orders_customers');
+
+            $argumentsOrdersCustomer = [
+                'id' => NULL,
+                'customer_id' => $customer_id,
+                'increment_id' => $increment,
+                'name' => $name,
+                'dni' => $dni,
+                'telf' => $telf,
+                'address' => $adress
+            ];
+
+
+            $query = $connection->insert($ordersCustomers, $argumentsOrdersCustomer)->execute();
+
+
+            return $query;
+
 
         }
 
