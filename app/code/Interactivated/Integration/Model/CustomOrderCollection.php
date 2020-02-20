@@ -7,14 +7,15 @@ namespace Interactivated\Integration\Model;
     {
 
         private $connectionFactory;
-        private $connection;
-
+        private $orderRepository;
         private $_objectManager;
         private $resourceConnection;
         private $logger;
+
         public function __construct(
             \Magento\Framework\App\ResourceConnection\ConnectionFactory $connectionFactory,
             \Psr\Log\LoggerInterface $logger,
+            \Magento\Sales\Model\OrderRepository $orderRepository,
             \Magento\Framework\ObjectManagerInterface $objectManager,
             \Magento\Framework\App\ResourceConnection $resourceConnection
         )
@@ -22,178 +23,150 @@ namespace Interactivated\Integration\Model;
 
             $this->connectionFactory = $connectionFactory;
             $this->logger = $logger;
+            $this->orderRepository = $orderRepository;
             $this->resourceConnection = $resourceConnection;
             $this->_objectManager = $objectManager;
 
         }
 
-
         public function update($orders){
+//                                       $order = $orders[6];
+                                                   foreach ($orders as $order) {
 
-            foreach ($orders as $order)  {
-
-                if ($this->checkData($order) == true){
-//                    if ($this->importNewOrder($order) == true) {
-                        $this->orderInformation($order);
-                        $this->importNewOrder($order);
-//                    }
-
-
-
+                if ($this->checkData($order) == true) {
+                    if ($this->importNewOrder($order) == true) {
+                        if ($this->orderInformation($order) == true) {
+                            $this->importToOrdersItems($order);
+                        }
+//
+                    }
                 }
-//                $some = $this->checkData($order);
-//                var_dump($some);
-//                die('check first step');
-//                if ($this->checkData($order)==true){
-////                    $checkdata = $this->checkData($order);
-////                    var_dump($checkdata);
-//                    die('hello woodi');
-//                    $this->importNewOrder($orders);
-//                }
-
             }
-
         }
-        public function checkData($order){
 
-//var_dump($order);
-//            die('popup woodi');
-//           $orseg =  $order['increment_id'];
-//           var_dump($order);
-//           die('defect in front');
-//            $order=7;
+        public function returnType($order){
+
+            $orderId = $order['entity_id'];
+
+
+            $orderqw = $this->orderRepository->get($orderId);
+//            var_dump($orderqw->getProductType());
+//            var_dump($order);
+
+            foreach ($orderqw->getAllItems() as $item) {
+                $type = $item->getProductType();
+//                if($type == 'simple'){
+//                    var_dump($type);
+//                }else{
+//                    var_dump($type);
+//                    die('qweqwewqeqweqw');
+//                }
+            }
+            return $type;
+        }
+
+        public function checkData($order)
+        {
+
+
+
 
             $check = $order['increment_id'];
 
+
             $connection = $this->resourceConnection->getConnection('custom');
 
-
-
             $table = $connection->getTableName('orders');
-//            die('свобода слова');
 
-            $getIncrement = $connection->select()->from($table)->where('increment_id=?',$check);
-            $asdasd=$connection->fetchRow($getIncrement);
+            $getIncrement = $connection->select()->from($table)->where('increment_id=?', $check);
+            $asdasd = $connection->fetchRow($getIncrement);
 
-//            var_dump($asdasd);
-//            die('як умру то поховайте');
-//            ("select `increment_id` from `orders` where `increment_id`='$check';");
-//            var_dump($getIncrement);
-//
-//            if($getIncrement == true){
-//                die('wqeqwe');
-//            }else {
-//                die('что произошло');
-//            }
-//
-//            die('I wont live');
-
-           if( $asdasd == false){
-          return true;
-           }else{
-               $this->logger->info('Already in DB '.$check);
-               return false;
-           }
-
-//            var_dump(get_class_methods($check));
+            if ($asdasd == false) {
+                return true;
+            } else {
+                $this->logger->info('Already in DB ' . $check);
+                return false;
+            }
 
 
         }
 
-        public function importNewOrder($order){
-
-
-//            $orderID = $order['entity_id'];
-//
-////            var_dump($orderID);
-////            die('die die die');
-//
-//            $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
-//            var_dump(get_class_methods($getCustomerInformation));
-//            die('local host');
-
-//            var_dump($orders);
-//            die('its variable == 6, please, die()');
-
+        public function importNewOrder($order)
+        {
             $increment_id = $order['increment_id'];
-
 
 
             $customer_id = $order['customer_id'];
             $total_amount = $order['base_total_due'];
-//            var_dump($total_amount);
-//            die('start to import files');
             $status = $order['status'];
             $updated_at = $order['updated_at'];
 
             $connection = $this->resourceConnection->getConnection('custom');
 
-
-
-
             $orders = $connection->getTableName('orders');
 
-
-
             $argumentsOrders = [
-                'id'=> NULL,
+                'id' => NULL,
                 'increment_id' => $increment_id,
                 'customer_id' => $customer_id,
-                'total_amount' =>$total_amount,
+                'total_amount' => $total_amount,
                 'status' => $status,
                 'order_date' => $updated_at
             ];
-//            $argumentsOrders= [
-//                'id' => NULL,
-//                'customer_id' => $customer_id,
-//                'increment_id' => $increment_id
-//            ];
-
-
 
 
             $query = $connection->insert($orders, $argumentsOrders);
-   if($query == true){
-       return true;
-   }else {
-       return true;
-   }
 
-//return $query;
-
-
-
-//                die('stop, please, stop');
-//           $status = $this->connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
-//            INSERT INTO `orders` (`id`, `increment_id`, `customer_id`, `total_amount`, `status`, `order_date`) VALUES (NULL, NULL, NULL, NULL, NULL, NULL);
-
+            if ($query == true) {
+                return true;
+            } else {
+                return true;
+            }
         }
 
-        public function orderInformation($order){
+        public function orderInformation($order)
+        {
+
+
+            $orderID = $order['entity_id'];
+
+            $getCustomerInformation = $this->_objectManager->get('Magento\Sales\Model\Order')->load($orderID);
+          $getShippingInformation =    $getCustomerInformation->getBillingAddress();
+
+//         for new method
+//                 var_dump(get_class_methods($getShippingInformation));
+//                 die();
 
 
 
-            $orderID =$order['entity_id']->;
-//            var_dump($orderID);
-//            die('some texe for detect connection');
+//
+//            var_dump(get_class_methods($getCustomerInformation));
+//            die('fdsg');
+//                ->getShippingAdress();
+
+//$dasss= $getCustomerInformation->getCustomerEmail();
+////       var_dump(get_class_methods($getCustomerInformation));
+//       var_dump($dasss);
+//       die('die in orderInformation');
 
 
-            $getCustomerInformation = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderID);
+            $increment = $order['increment_id'];
 
-            $getShippingInformation = $getCustomerInformation->getShippingAddress();
+            $customer_id = $order['customer_id'];
 
-
-            $customer_id = $getCustomerInformation->getCustomerId();//customer_ID
-
-
-            $increment = $getCustomerInformation->getIncrementId();//incriment ID
+            $name = $getCustomerInformation->getCustomerName();
 
 
-            $lastname = $getShippingInformation->getLastName();
 
-            $firstname = $getShippingInformation->getFirstName();
+//            var_dump(get_class_methods($getCustomerInformation));
+//            die('asdasd');
 
-            $name = $firstname." ".$lastname;
+
+
+//            var_dump(get_class_methods($getCustomerInformation));
+//            var_dump($getCustomerInformation->());
+//die('asdasd');
+
 
 
             $telf =  $getShippingInformation->getTelephone();//telephome
@@ -202,19 +175,19 @@ namespace Interactivated\Integration\Model;
 
             $region =  $getShippingInformation->getRegion();//region
 
-            $countryid =  $getShippingInformation->getCountryId();//US country id
+            $countryid = $getShippingInformation->getCountryId();//US country id
 
-            $postCode =  $getShippingInformation->getPostCode();//postCode
+            $postCode = $getShippingInformation->getPostCode();//postCode
 
-            $email =  $getShippingInformation->getEmail();//email
+            $email = $getShippingInformation->getCustomerEmail();//email
+
+
 
             $dni = 0;
 
-
-            $adress = $city.", ".$region.", ".$countryid.", ".$postCode.", ".$telf.", ".$email;
+            $adress = $city . ", " . $region . ", " . $countryid . ", " . $postCode . ", " . $telf . ", " . $email;
 
             $connection = $this->resourceConnection->getConnection('custom');
-
 
             $ordersCustomers = $connection->getTableName('orders_customers');
 
@@ -228,16 +201,66 @@ namespace Interactivated\Integration\Model;
                 'address' => $adress
             ];
 
-
-            $query = $connection->insert($ordersCustomers, $argumentsOrdersCustomer)->execute();
-
-
-            return $query;
+//            var_dump($argumentsOrdersCustomer);
+//
+//            die('die dsddddddd');
 
 
+            $query = $connection->insert($ordersCustomers, $argumentsOrdersCustomer);
+
+            if ($query == true) {
+                return true;
+            } else {
+                return true;
+            }
         }
 
 
+        public function importToOrdersItems($order)
+        {
+
+            $orderId = $order['entity_id'];
+            $base_row_total_incl_tax = $order['total_due'];
+            $increment = $order['increment_id'];
+            $price_unit = $order['base_subtotal'];
+            $orderqw = $this->orderRepository->get($orderId);
+
+            foreach ($orderqw->getAllItems() as $item) {
+//                var_dump($item->getProductType());
+
+                $sku= $item['sku'];
+                $size= $item['size'];
+                $color= $item['color'];
+                $line= $item['line'];
+                $discount_amount= $item['discount_amount'];
+                $qty= $item['product_options']['info_buyRequest']['qty'];
+            }
+
+            $argumentsOrdersItems = [
+                'id' => NULL,
+                'increment_id' => $increment,
+                'product_sku' => $sku,
+                'size' => $size,
+                'color' => $color,
+                'line' => $line,
+                'qty' => $qty,
+                'price_unit' => $price_unit,
+                'discount_1' => $discount_amount,
+                'total_amount_line' => $base_row_total_incl_tax
+            ];
 
 
+            $connection = $this->resourceConnection->getConnection('custom');
+
+            $ordersItems = $connection->getTableName('orders_items');
+
+            $query = $connection->insert($ordersItems, $argumentsOrdersItems);
+
+            if ($query == true) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
     }
