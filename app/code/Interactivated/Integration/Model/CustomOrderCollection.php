@@ -29,19 +29,21 @@ namespace Interactivated\Integration\Model;
 
         }
 
-        public function update($orders){
-//                                       $order = $orders[6];
-                                                   foreach ($orders as $order) {
-
-                if ($this->checkData($order) == true) {
-                    if ($this->importNewOrder($order) == true) {
-                        if ($this->orderInformation($order) == true) {
-                            $this->importToOrdersItems($order);
+        public function update($orders)
+        {
+                                       $order = $orders[6];
+            $this->productsTyc($order);
+//            foreach ($orders as $order) {
+//                if ($this->checkData($order) == true) {
+            if ($this->importNewOrder($order) == true) {
+                if ($this->orderInformation($order) == true) {
+                    if ($this->importToOrdersItems($order) == true) {
+                            }
                         }
 //
                     }
-                }
-            }
+//                }
+//            }
         }
 
         public function returnType($order){
@@ -67,8 +69,6 @@ namespace Interactivated\Integration\Model;
 
         public function checkData($order)
         {
-
-
 
 
             $check = $order['increment_id'];
@@ -215,7 +215,73 @@ namespace Interactivated\Integration\Model;
             }
         }
 
+        public function productsTyc($order)
+        {
+//            $orderId = $order['entity_id'];
+//            $orderqw = $this->orderRepository->get($orderId);
+//
+//            var_dump(get_class_methods($orderqw->getData()));
+//            die('get cm');
 
+//            foreach ($orderqw->getAllItems() as $item) {
+//
+//
+////var_dump($item->getProductType());
+////die();
+//
+////                var_dump(get_class_methods($item->getProduct()));
+////                var_dump($item->getProduct()->getSku());
+////                die('fdg');
+//
+////if($item->getProductType() === "virtual"){
+////    $skuSimple = $item->getProduct()->getSku()."1111111111111";
+////}else{
+//
+//    $skuSimple = $item['sku']."00000";
+//
+////}
+//
+//
+////        $skuSimple = $item->getProduct()->getSku();
+//        echo "<pre>";
+////        var_dump($skuSimple);
+////        die('detect my die()');
+//
+//
+//                $skuConfigur = $item['sku'];
+//
+//
+//            }
+
+//            var_dump($skuSimple);
+
+//            die('hello world');
+//            die('some text , detect meeee');
+
+
+
+
+//            $productsTyc = [
+//                'sku_simple' => '12',
+//                'sku_configurable' => '111111111111'
+//            ];
+//            var_dump($productsTyc);
+//            die('qweqwe');
+//            die('');
+
+            $connection = $this->resourceConnection->getConnection('custom');
+
+//            $productsTycConnection = $connection->getTableName('products_tyc');
+
+
+            $query = $connection->query("INSERT INTO `products_tyc` (`sku_simple`, `sku_configurable`) VALUES ('2222222', '111111111111');")->execute();
+            var_dump($query);
+            die('');
+
+
+
+
+        }
         public function importToOrdersItems($order)
         {
 
@@ -225,10 +291,9 @@ namespace Interactivated\Integration\Model;
             $price_unit = $order['base_subtotal'];
             $orderqw = $this->orderRepository->get($orderId);
 
-            foreach ($orderqw->getAllItems() as $item) {
-//                var_dump($item->getProductType());
 
-                $sku= $item['sku'];
+            foreach ($orderqw->getAllItems() as $item) {
+                $skuConfigur= $item['sku'];
                 $size= $item['size'];
                 $color= $item['color'];
                 $line= $item['line'];
@@ -239,7 +304,7 @@ namespace Interactivated\Integration\Model;
             $argumentsOrdersItems = [
                 'id' => NULL,
                 'increment_id' => $increment,
-                'product_sku' => $sku,
+                'product_sku' => $skuConfigur,
                 'size' => $size,
                 'color' => $color,
                 'line' => $line,
@@ -259,7 +324,7 @@ namespace Interactivated\Integration\Model;
             if ($query == true) {
                 return true;
             } else {
-                return false;
+                return true;
             }
 
         }
