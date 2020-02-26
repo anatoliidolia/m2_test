@@ -23,7 +23,7 @@ class CallController{
 
     ) {
         $this->logger = $logger;
-        $this->_index = $index;
+        $this->index = $index;
         $this->_cacheTypeList = $cacheTypeList;
         $this->_cacheFrontendPool = $cacheFrontendPool;
     }
@@ -32,6 +32,7 @@ class CallController{
     public function execute()
     {
         $this->logger->info('C444444444444444ron Works123123123');
+        $this->index->execute();
 
     }
 

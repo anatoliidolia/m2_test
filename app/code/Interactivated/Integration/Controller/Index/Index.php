@@ -9,16 +9,20 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $resultPageFactory;
 
+    protected $resultBlockFactory;
+
     /**
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Interactivated\Integration\Block\OrdersFactory $resultBlockFactory
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
+        $this->resultBlockFactory = $resultBlockFactory;
     }
 
     /**
@@ -26,9 +30,10 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-
-        $resultPage = $this->resultPageFactory->create();
-        return $resultPage;
+        $resultBlock = $this->resultBlockFactory->create();
+        $status = $resultBlock->connectionToNewTable();
+       // $resultPage = $this->resultPageFactory->create();
+        return $status;
 
     }
 }

@@ -31,20 +31,23 @@ namespace Interactivated\Integration\Model;
 
         public function update($orders)
         {
-                                       $order = $orders[6];
-            $this->productsTyc($order);
-//            foreach ($orders as $order) {
-//                if ($this->checkData($order) == true) {
-            if ($this->importNewOrder($order) == true) {
-                if ($this->orderInformation($order) == true) {
-                    if ($this->importToOrdersItems($order) == true) {
-                            }
+//                                       $order = $orders[6];
+            foreach ($orders as $order) {
+                if ($this->checkData($order) == true) {
+                    if ($this->importNewOrder($order) == true) {
+                        if ($this->orderInformation($order) == true) {
+                            $this->importToOrdersItems($order);
+//                        $this->productsTyc($order);
+
                         }
 //
                     }
 //                }
 //            }
+                }
+            }
         }
+
 
         public function returnType($order){
 
