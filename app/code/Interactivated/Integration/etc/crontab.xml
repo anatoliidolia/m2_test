@@ -7,6 +7,10 @@
    <job name="interesting_things" instance="Interactivated\Integration\Cron\CallController" method="execute">
             <schedule>* * * * *</schedule>
         </job>
+<!--    <job name="cache_flush" instance="Interactivated\CronTab\Cron\CacheIndex" method="cacheFlush">-->
+<!--        <schedule>00 3 * * *</schedule>-->
+<!--    </job>-->
+
 </group>
 
         </config>
