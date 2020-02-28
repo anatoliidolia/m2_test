@@ -273,14 +273,44 @@ class Orders extends \Magento\Framework\View\Element\Template
 
     public function connectionToNewTable(){
 
+
         $orderCollecion = $this->orderCollectionFactory
             ->create()
             ->addFieldToSelect('*');
 
-        $orderCollecion->addAttributeToFilter('store_id', ['eq'=>1]);
+//        $orderCollecion->addAttributeToFilter( 'status' ,['eq'=>'complete']
+//
+//        );
+
+//        var_dump($data);
+//        $thisDate =  date('Y-m-d H:i:s');
+//        echo $thisDate."<BR>";
+//        $yesterday = date('Y-m-d H:i:s', strtotime($thisDate. " - 29 day"));
+//        echo $yesterday;
+//        die(' date');
+
+
+        $orderCollecion->addAttributeToFilter( 'store_id', ['eq'=>1]);
+//        $orderCollecion->addAttributeToFilter( 'created_at' ,['from'=>$yesterday, 'to'=>$thisDate]);
+//        $orderCollecion->addAttributeToFilter( 'status' ,['eq'=>'pending']
+//        );
+
+//        ('from'=>$startDate, 'to'=>$endDate)
+
+
+//        $data = $orderCollecion->getData();
+
+
+
+//            'store_id', ['eq'=>1]);
 
         $data = $orderCollecion->getData();
 
+
+
+
+
+//        $orderCollecion->addAttributeToFilter('state', ['eq'=>'Complete']);           // for live
 
 //        $increment_id = $data[$asd]['increment_id'];
 //
@@ -293,17 +323,19 @@ class Orders extends \Magento\Framework\View\Element\Template
 
        // return $data;
         $status = $this->updateCustomOrderCollection($data);
+
+
+
+
         return $status;
 
 
- //       $some = $connection->query("UPDATE `orders` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
+ //       $some = $connection->query("UPDATE `orde2rs` SET `increment_id` = '$increment_id', `customer_id` = '$customer_id', `total_amount` = '$total_amount',`status` = '$status',`order_date` = '$updated_at'  WHERE `orders`.`id` = 1;")->execute();
 
        // return $data;
 
     }
     public function updateCustomOrderCollection($data){
-
-
 
         $customOrderCollection = $this->getCustomOrderCollectionFactory()->create();
 

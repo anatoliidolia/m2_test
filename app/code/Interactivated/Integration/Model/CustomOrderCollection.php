@@ -3,6 +3,8 @@
 namespace Interactivated\Integration\Model;
 
 
+    use Magento\Framework\View\Asset\NotationResolver\Variable;
+
     class CustomOrderCollection
     {
 
@@ -31,9 +33,9 @@ namespace Interactivated\Integration\Model;
 
         public function update($orders)
         {
-//                                       $order = $orders[6];
-            foreach ($orders as $order) {
-                if ($this->checkData($order) == true) {
+                                       $order = $orders[6];
+//            foreach ($orders as $order) {
+//                if ($this->checkData($order) == true) {
                     if ($this->importNewOrder($order) == true) {
                         if ($this->orderInformation($order) == true) {
                             $this->importToOrdersItems($order);
@@ -41,10 +43,10 @@ namespace Interactivated\Integration\Model;
 
                         }
 //
-                    }
+//                    }
 //                }
 //            }
-                }
+//                }
             }
         }
 
@@ -100,7 +102,12 @@ namespace Interactivated\Integration\Model;
 
 
             $customer_id = $order['customer_id'];
-            $total_amount = $order['base_total_due'];
+            $total_amount = $order['base_grand_total'];
+//            var_dump($total_amount);
+//            echo "<br>";
+//            var_dump($order);
+//            die('total amount');
+
             $status = $order['status'];
             $updated_at = $order['updated_at'];
 
@@ -182,8 +189,7 @@ namespace Interactivated\Integration\Model;
 
             $postCode = $getShippingInformation->getPostCode();//postCode
 
-            $email = $getShippingInformation->getCustomerEmail();//email
-
+            $email = $getCustomerInformation->getCustomerEmail();//email
 
 
             $dni = 0;
@@ -289,13 +295,21 @@ namespace Interactivated\Integration\Model;
         {
 
             $orderId = $order['entity_id'];
-            $base_row_total_incl_tax = $order['total_due'];
             $increment = $order['increment_id'];
             $price_unit = $order['base_subtotal'];
             $orderqw = $this->orderRepository->get($orderId);
 
 
             foreach ($orderqw->getAllItems() as $item) {
+                $type = $item->getProductType();
+                if($type == 'configurable'){
+                    var_dump($item->getProductOptions()['attributes_info']);
+
+                    die('some die');
+                }else {
+                    var_dump($item->getProductType());
+                    die('sharade ');
+                }
                 $skuConfigur= $item['sku'];
                 $size= $item['size'];
                 $color= $item['color'];
@@ -303,6 +317,8 @@ namespace Interactivated\Integration\Model;
                 $discount_amount= $item['discount_amount'];
                 $qty= $item['product_options']['info_buyRequest']['qty'];
             }
+
+            $base_row_total_incl_tax = $price_unit - $discount_amount;
 
             $argumentsOrdersItems = [
                 'id' => NULL,
